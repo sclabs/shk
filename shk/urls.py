@@ -5,12 +5,12 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # contracts app
-    url(r'^contracts/', include('shk.contracts.urls')),
+    url(r'^contracts/', include('contracts.urls')),
 
     # auth-related URLs
-    #url(r'^login/', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
-    #url(r'^logout/', 'django.contrib.auth.views.logout', {'template_name': 'logout.html'}),
-
+    url(r'^login/', 'django.contrib.auth.views.login'),
+    url(r'^logout/', 'django.contrib.auth.views.logout', {'next_page': '/loggedout/'}),
+    url(r'^loggedout/', 'shk.views.loggedout'),
     # admin docs
     #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
