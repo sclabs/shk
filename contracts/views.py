@@ -40,6 +40,14 @@ def contracts(request):
     contractsToMe = RecallContract.objects.filter(sender=request.user)
 
     # get all the contracts issued by the player
-    contractsByMe = RecallContract.objects.filter(recipient.user=request.user)
+    # first get all the user's villages
+    villages = Village.objects.filter(user=response.user)
+
+    # list of all the contracts
+    contractsByMe = []
+
+    # fill in the list
+    for village in villages:
+        contractsByMe.append(RecallContract.object.filter(recipient=village))
 
     return render_to_response('contracts.html', locals())
