@@ -5,3 +5,6 @@ def loggedout(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect('/logout/')
     return render_to_response('registration/logout.html')
+
+def passwordchanged(request):
+    return render_to_response('registration/passwordchanged.html')
