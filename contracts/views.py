@@ -42,4 +42,4 @@ def contracts(request):
     # get all the contracts issued by the player
     contractsByMe = RecallContract.objects.filter(recipient.user=request.user)
 
-    return render_to_response('contracts.html')
+    return render_to_response('contracts.html', locals())
