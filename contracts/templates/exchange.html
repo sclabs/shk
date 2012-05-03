@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load dictionary %}
+
+{% block title %}shk - exchange{% endblock %}
+
+{% block content %}
+
+<p>Exchange</p>
+
+<a href="">Create New Contract</a>
+
+{% if contracts %}
+<table border="1">
+  <tr>
+    <th>Offering</td>
+    <th>For</td>
+    <th>Accept</td>
+  </tr>
+  {% for contract in contracts %}
+  <tr>
+    <td>
+      <ul>
+        {% for bundle in sendBundles|lookup:contract.id %}
+        <li>{{ bundle.qty }} {{ bundle.type }}</li>
+        {% endfor %}
+      </ul>
+    </td>
+    <td>
+      <ul>
+        {% for bundle in receiveBundles|lookup:contract.id %}
+        <li>{{ bundle.qty }} {{ bundle.type }}</li>
+        {% endfor %}
+      </ul>
+    </td>
+    <td><a href="">Accept Contract</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>There are currently no contracts available.</p>
+{% endif %}
+
+{% endblock %}
