@@ -37,22 +37,6 @@ def exchange(request):
                 sendBundles[contract.id].append(bundle)
             else:
                 receiveBundles[contract.id].append(bundle)
-
-    # lists that map contracts to lists of bundles
-    #sendBundles = []
-    #receiveBundles = []
-
-    # fill in the lists
-    #for contract in contracts:
-    #    bundles = Bundle.objects.filter(contract=contract)
-    #    sendBundleList = []
-    #    receiveBundleList = []
-    #    for bundle in bundles:
-    #        if bundle.send:
-    #            sendBundleList.append(bundle)
-    #        else:
-    #            receiveBundleLi.append(bundle)
-    
     return render_to_response('exchange.html', locals())
 
 #def IOUs(request):
