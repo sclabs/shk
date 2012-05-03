@@ -1,4 +1,4 @@
-from .models import ExchangeContract, Bundle
+from .models import ExchangeContract, Bundle, IOU
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
@@ -15,13 +15,7 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def exchange(request):
     # get all the contracts
-    #contracts = []
-    try:
-        #contracts.append(ExchangeContract.objects.get())
-        contracts = ExchangeContract.objects.all()
-    except ExchangeContract.DoesNotExist:
-        contracts = None
-        return render_to_response('exchange.html', locals())
+    contracts = ExchangeContract.objects.all()
     
     # dictionaries that map contracts to lists of bundles
     sendBundles = {}
@@ -37,8 +31,17 @@ def exchange(request):
                 sendBundles[contract.id].append(bundle)
             else:
                 receiveBundles[contract.id].append(bundle)
+                
     return render_to_response('exchange.html', locals())
 
-#def IOUs(request):
+@login_required
+def IOUs(request):
+    # get all the IOUs held by the user
+    iousHeld = IOU.objects.filter(holder=request.user)
 
+    # get all the IOUs issued by the user
+    iousIssued = IOU.objects.filter(issuer=request.user)
+
+    return render_to_response('ious.html', locals())
+    
 #def contracts(request):
