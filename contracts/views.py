@@ -1,16 +1,6 @@
-from .models import ExchangeContract, Bundle, IOU
+from .models import ExchangeContract, Bundle, IOU, RecallContract, Village
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
-
-#def availableContracts(request):
-
-#def outstandingIOUs(request):
-
-#def heldIOUs(request):
-
-#def issuedContracts(request):
-
-#def acceptedContracts(request):
 
 @login_required
 def exchange(request):
@@ -43,5 +33,13 @@ def IOUs(request):
     iousIssued = IOU.objects.filter(issuer=request.user)
 
     return render_to_response('ious.html', locals())
-    
-#def contracts(request):
+
+@login_required
+def contracts(request):
+    # get all the contracts issued to the player
+    contractsToMe = RecallContract.objects.filter(sender=request.user)
+
+    # get all the contracts issued by the player
+    contractsByMe = RecallContract.objects.filter(recipient.user=request.user)
+
+    return render_to_response('contracts.html')
