@@ -65,6 +65,10 @@ STATIC_ROOT = ''
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
+# auth-related URLs
+LOGIN_URL = '/login/'
+LOGOUT_URL = '/logout/'
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
