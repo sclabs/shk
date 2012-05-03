@@ -41,7 +41,7 @@ def contracts(request):
 
     # get all the contracts issued by the player
     # first get all the user's villages
-    villages = Village.objects.filter(user=response.user)
+    villages = Village.objects.filter(user=request.user)
 
     # list of all the contracts
     contractsByMe = []
