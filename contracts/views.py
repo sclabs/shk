@@ -2,7 +2,9 @@ from .models import ExchangeContract, Bundle, IOU, RecallContract, Village
 from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
+from django.utils import timezone
 from .forms import VillageForm
+from datetime import datetime
 
 @login_required
 def exchange(request):
@@ -51,6 +53,16 @@ def contracts(request):
     # fill in the list
     for village in villages:
         contractsByMe.extend(RecallContract.objects.filter(recipient=village))
+
+    # use this dict to keep track of which contracts are failable
+    failable = {}
+
+    # fill in the dict
+    for contract in contractsByMe:
+        if contract.timeout < timezone.now():
+            failable[contract.id] = True
+        else:
+            failable[contract.id] = False
 
     return render_to_response('contracts.html', locals())
 

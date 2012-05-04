@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load dictionary %}
+
 {% block title %}shk - my IOUs{% endblock %}
 
 {% block content %}
@@ -40,6 +42,7 @@
     <th>Sender</th>
     <th>Timeout</th>
     <th>Complete</th>
+    <th>Fail</th>
   </tr>
   {% for contract in contractsByMe %}
   <tr>
@@ -49,6 +52,11 @@
     <td>{{ contract.sender }}</td>
     <td>{{ contract.timeout }}</td>
     <td><a href="">Complete Contract</a></td>
+    <td>
+      {% if failable|lookup:contract.id %}
+      <a href="">Report Failure</a>
+      {% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>
