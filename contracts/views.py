@@ -1,9 +1,9 @@
 from .models import ExchangeContract, Bundle, IOU, RecallContract, Village
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.utils import timezone
-from .forms import VillageForm
+from .forms import VillageForm, RecallForm
 
 @login_required
 def exchange(request):
@@ -28,7 +28,7 @@ def exchange(request):
     return render_to_response('exchange.html', locals())
 
 @login_required
-def IOUs(request):
+def ious(request):
     # get all the IOUs held by the user
     iousHeld = IOU.objects.filter(holder=request.user)
 
@@ -94,7 +94,7 @@ def addVillage(request):
             return redirect('villages')
     else:
         form = VillageForm()
-    return render_to_response('addVillage.html', {'form': form},   RequestContext(request))
+    return render_to_response('addVillage.html', {'form': form}, RequestContext(request))
 
 @login_required
 def removeVillage(request, id):
@@ -108,3 +108,46 @@ def removeVillage(request, id):
     except Village.DoesNotExist:
         pass
     return redirect('villages')
+
+@login_required
+def recall(request, id):
+    # get the iou to be recalled or redirect to ious
+    try:
+        iou = IOU.objects.get(id=id)
+    except IOU.DoesNotExist:
+        return redirect('ious')
+        
+    if request.method == 'POST':
+        # redirect to ious if you don't hold this iou
+        if iou.holder != request.user:
+            return redirect('ious')
+
+        # make the bound form
+        form = RecallForm(request.POST, iou=iou)
+
+        # validate
+        if form.is_valid():
+
+            # clean
+            cd = form.cleaned_data
+            
+            # if you recalled everything, the iou is gone 
+            if cd['qty'] == iou.qty:
+                iou.delete()
+
+            # otherwise, decrement the quantity owed by the quantity contracted
+            else:
+                iou.qty -= cd['qty']
+                iou.save()
+
+            # create the contract
+            contract = RecallContract(sender=iou.issuer,
+                                      recipient=cd['recipient'],
+                                      qty=cd['qty'],
+                                      type=iou.type,
+                                      timeout=cd['timeout'])
+            contract.save()
+            return redirect('contracts')
+    else:
+        form = RecallForm(iou=iou)
+    return render_to_response('recall.html', {'form': form}, RequestContext(request))

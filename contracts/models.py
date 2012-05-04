@@ -19,11 +19,11 @@ class IOU(models.Model):
         return u'%s owes %s %s %s' % (self.issuer, self.holder, self.qty, self.type)
 
 class RecallContract(models.Model):
-    sender    = models.ForeignKey(User, null=True, blank=True)
-    recipient = models.ForeignKey(Village, null=True, blank=True)
+    sender    = models.ForeignKey(User)
+    recipient = models.ForeignKey(Village)
     qty       = models.IntegerField()
     type      = models.CharField(max_length=10, choices=GOOD_TYPES)
-    timeout   = models.DateTimeField() 
+    timeout   = models.DateTimeField()
 
     def __unicode__(self):
         return u'%s sending %s %s to %s by %s' % (self.sender, self.qty,
