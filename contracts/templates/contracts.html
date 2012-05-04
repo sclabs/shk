@@ -51,7 +51,7 @@
     <td>{{ contract.recipient }}</td>
     <td>{{ contract.sender }}</td>
     <td>{{ contract.timeout }}</td>
-    <td><a href="">Complete Contract</a></td>
+    <td><a href="{% url complete contract.id %}">Complete Contract</a></td>
     <td>
       {% if failable|lookup:contract.id %}
       <a href="">Report Failure</a>

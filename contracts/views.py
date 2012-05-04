@@ -98,9 +98,12 @@ def addVillage(request):
 
 @login_required
 def removeVillage(request, id):
+    # get the village
     try:
         village = Village.objects.get(id=id)
+        # make sure this is the user's village
         if village.user == request.user:
+            # make sure this village is not involved in contracts
             if RecallContract.objects.filter(recipient=village):
                 pass
             else:
@@ -127,7 +130,6 @@ def recall(request, id):
 
         # validate
         if form.is_valid():
-
             # clean
             cd = form.cleaned_data
             
@@ -147,7 +149,21 @@ def recall(request, id):
                                       type=iou.type,
                                       timeout=cd['timeout'])
             contract.save()
-            return redirect('contracts')
+            return redirect('ious')
     else:
         form = RecallForm(iou=iou)
     return render_to_response('recall.html', {'form': form}, RequestContext(request))
+
+@login_required
+def complete(request, id):
+    # get the contract
+    try:
+        contract = RecallContract.objects.get(id=id)
+        # check to see if it was issued by the user
+        if contract.recipient.user == request.user:
+            # delete the contract
+            contract.delete()
+    except RecallContract.DoesNotExist:
+        pass
+    return redirect('contracts')
+    
