@@ -72,6 +72,7 @@ STATIC_URL = '/static/'
 # auth-related URLs
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
+LOGIN_REDIRECT_URL = '/market/exchange/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
