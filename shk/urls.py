@@ -5,7 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # contracts app
-    url(r'^contracts/', include('contracts.urls')),
+    url(r'^market/', include('market.urls')),
 
     # auth-related URLs
     url(r'^login/$', 'django.contrib.auth.views.login',),

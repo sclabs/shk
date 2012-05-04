@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('contracts.views',
+urlpatterns = patterns('market.views',
     url(r'^exchange/$', 'exchange'),
     url(r'^ious/$', 'ious', name='ious'),
     url(r'^ious/recall/(\d+)/$', 'recall', name='recall'),
