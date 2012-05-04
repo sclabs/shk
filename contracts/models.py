@@ -26,9 +26,9 @@ class RecallContract(models.Model):
     timeout   = models.DateTimeField() 
 
     def __unicode__(self):
-        return u'%s sending %s %s to %s for %s by %s' % (self.sender, self.qty,
-                                                         self.type, self.recipient,
-                                                         self.iou, self.timeout)
+        return u'%s sending %s %s to %s by %s' % (self.sender, self.qty,
+                                                  self.type, self.recipient,
+                                                  self.timeout)
 
 class ExchangeContract(models.Model):
     issuer = models.ForeignKey(User)

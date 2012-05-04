@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% load dictionary %}
+
+{% block title %}shk - my villages{% endblock %}
+
+{% block content %}
+
+<p>My Villages</p>
+
+<a href="{% url addVillage %}">Add New Village</a>
+
+{% if villages %}
+<table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Remove</th>
+  </tr>
+  {% for village in villages %}
+  <tr>
+    <td>
+      {{ village.name }}
+    </td>
+    <td>
+      {% if deletable|lookup:village.id %}
+      <a href="{% url removeVillage village.id %}">Remove Village</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>You haven't added any villages.</p>
+{% endif %}
+
+{% endblock %}
