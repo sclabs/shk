@@ -166,4 +166,32 @@ def complete(request, id):
     except RecallContract.DoesNotExist:
         pass
     return redirect('contracts')
-    
+
+@login_required
+def fail(request, id):
+    # get the contract
+    try:
+        contract = RecallContract.objects.get(id=id)
+        # check to see if it was issued by the user
+        if contract.recipient.user == request.user:
+            # check to see that the timeout has passed
+            if contract.timeout < timezone.now():
+                # if an IOU like this already exists, add to it
+                try:
+                    iou = IOU.objects.get(issuer=contract.sender,
+                                          holder=request.user,
+                                          type=contract.type)
+                    iou.qty += contract.qty
+                    iou.save()
+                # otherwise, create a new one
+                except IOU.DoesNotExist:
+                    iou = IOU(issuer=contract.sender,
+                              holder=request.user,
+                              qty=contract.qty,
+                              type=contract.type)
+                    iou.save()
+                # delete the contract
+                contract.delete()
+    except RecallContract.DoesNotExist:
+        pass
+    return redirect('contracts')

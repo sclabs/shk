@@ -54,7 +54,7 @@
     <td><a href="{% url complete contract.id %}">Complete Contract</a></td>
     <td>
       {% if failable|lookup:contract.id %}
-      <a href="">Report Failure</a>
+      <a href="{% url fail contract.id %}">Report Failure</a>
       {% endif %}
     </td>
   </tr>
