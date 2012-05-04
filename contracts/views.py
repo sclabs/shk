@@ -50,7 +50,7 @@ def contracts(request):
 
     # fill in the list
     for village in villages:
-        contractsByMe.append(RecallContract.object.filter(recipient=village))
+        contractsByMe.append(RecallContract.objects.filter(recipient=village))
 
     return render_to_response('contracts.html', locals())
 
