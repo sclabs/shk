@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.utils import timezone
 from .forms import VillageForm
-from datetime import datetime
 
 @login_required
 def exchange(request):
