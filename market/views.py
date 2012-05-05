@@ -7,8 +7,11 @@ from .forms import *
 
 @login_required
 def exchange(request):
-    # get all the contracts
-    contracts = ExchangeContract.objects.all()
+    # get all the contracts not issued by the user
+    contracts = ExchangeContract.objects.all().exclude(issuer=request.user)
+
+    # get all the contracts issued by the user
+    myContracts = ExchangeContract.objects.filter(issuer=request.user)
     
     # dictionaries that map contracts to lists of bundles
     sendBundles = {}
@@ -24,6 +27,21 @@ def exchange(request):
                 sendBundles[contract.id].append(bundle)
             else:
                 receiveBundles[contract.id].append(bundle)
+                
+    # dictionaries that map myContracts to lists of bundles
+    mySendBundles = {}
+    myReceiveBundles = {}
+
+    # fill in the dictionaries
+    for contract in myContracts:
+        bundles = Bundle.objects.filter(contract=contract)
+        mySendBundles[contract.id] = []
+        myReceiveBundles[contract.id] = []
+        for bundle in bundles:
+            if bundle.send:
+                mySendBundles[contract.id].append(bundle)
+            else:
+                myReceiveBundles[contract.id].append(bundle)
                 
     return render_to_response('exchange.html', locals())
 
@@ -234,3 +252,16 @@ def create(request, send, receive):
     else:
         form = CreateForm(send=send, receive=receive)
     return render_to_response('create.html', {'form': form}, RequestContext(request))
+
+@login_required
+def cancel(request, id):
+    # get the contract
+    try:
+        contract = ExchangeContract.objects.get(id=id)
+        # check to see if it was issued by the user
+        if contract.issuer == request.user:
+            # delete the contract
+            contract.delete()
+    except ExchangeContract.DoesNotExist:
+        pass
+    return redirect('exchange')
