@@ -6,7 +6,7 @@ class VillageForm(forms.Form):
     name = forms.CharField(max_length=30)
 
 class RecallForm(forms.Form):
-    qty       = forms.PositiveIntegerField()
+    qty       = forms.IntegerField()
     recipient = forms.ModelChoiceField(queryset=Village.objects.none())
     timeout   = forms.DateTimeField()
 
@@ -35,8 +35,8 @@ class RecallForm(forms.Form):
         return qty
 
 class PrecreateForm(forms.Form):
-    send    = forms.PositiveIntegerField()
-    receive = forms.PositiveIntegerField()
+    send    = forms.IntegerField()
+    receive = forms.IntegerField()
 
 class CreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -44,8 +44,8 @@ class CreateForm(forms.Form):
         receive = kwargs.pop('receive')
         super(CreateForm, self).__init__(*args, **kwargs)
         for i in xrange(int(send)):
-            self.fields['send_qty_%i' % i] = forms.PositiveIntegerField()
+            self.fields['send_qty_%i' % i] = forms.IntegerField()
             self.fields['send_type_%i' % i] = forms.ChoiceField(choices=GOOD_TYPES)
         for i in xrange(int(receive)):
-            self.fields['receive_qty_%i' % i] = forms.PositiveIntegerField()
+            self.fields['receive_qty_%i' % i] = forms.IntegerField()
             self.fields['receive_type_%i' % i] = forms.ChoiceField(choices=GOOD_TYPES)

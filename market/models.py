@@ -12,7 +12,7 @@ class Village(models.Model):
 class IOU(models.Model):
     issuer = models.ForeignKey(User, related_name='issuer')
     holder = models.ForeignKey(User, related_name='holder')
-    qty    = models.PositiveIntegerField()
+    qty    = models.IntegerField()
     type   = models.CharField(max_length=10, choices=GOOD_TYPES)
 
     def __unicode__(self):
@@ -21,7 +21,7 @@ class IOU(models.Model):
 class RecallContract(models.Model):
     sender    = models.ForeignKey(User)
     recipient = models.ForeignKey(Village)
-    qty       = models.PositiveIntegerField()
+    qty       = models.IntegerField()
     type      = models.CharField(max_length=10, choices=GOOD_TYPES)
     timeout   = models.DateTimeField()
 
@@ -38,7 +38,7 @@ class ExchangeContract(models.Model):
 
 class Bundle(models.Model):
     send     = models.BooleanField()
-    qty      = models.PositiveIntegerField()
+    qty      = models.IntegerField()
     type     = models.CharField(max_length=10, choices=GOOD_TYPES)
     contract = models.ForeignKey(ExchangeContract)
 
