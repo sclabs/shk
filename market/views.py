@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.utils import timezone
-from .forms import VillageForm, RecallForm
+from .forms import *
 
 @login_required
 def exchange(request):
@@ -195,3 +195,42 @@ def fail(request, id):
     except RecallContract.DoesNotExist:
         pass
     return redirect('contracts')
+
+@login_required
+def precreate(request):
+    if request.method == 'POST':
+        form = PrecreateForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return redirect('create', cd['send'], cd['receive'])
+    else:
+        form = PrecreateForm()
+    return render_to_response('precreate.html', {'form': form}, RequestContext(request))
+
+@login_required
+def create(request, send, receive):
+    if request.method == 'POST':
+        form = CreateForm(request.POST, send=send, receive=receive)
+        if form.is_valid():
+            cd = form.cleaned_data
+            # create an ExchangeContract
+            contract = ExchangeContract(issuer=request.user)
+            contract.save()
+            # create the sendBundles
+            for i in xrange(int(send)):
+                sendBundle = Bundle(send=True,
+                                    qty=cd['send_qty_%i' % i],
+                                    type=cd['send_type_%i' % i],
+                                    contract=contract)
+                sendBundle.save()
+            # create the receiveBundles
+            for i in xrange(int(receive)):
+                receiveBundle = Bundle(send=False,
+                                       qty=cd['receive_qty_%i' % i],
+                                       type=cd['receive_type_%i' % i],
+                                       contract=contract)
+                receiveBundle.save()
+            return redirect('exchange')
+    else:
+        form = CreateForm(send=send, receive=receive)
+    return render_to_response('create.html', {'form': form}, RequestContext(request))
