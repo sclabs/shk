@@ -185,7 +185,7 @@ def complete(request, id):
         pass
     return redirect('contracts')
 
-@login_required
+'''@login_required
 def fail(request, id):
     # get the contract
     try:
@@ -202,7 +202,7 @@ def fail(request, id):
                 contract.delete()
     except RecallContract.DoesNotExist:
         pass
-    return redirect('contracts')
+    return redirect('contracts')'''
 
 @login_required
 def precreate(request):
@@ -256,7 +256,7 @@ def cancel(request, id):
         pass
     return redirect('exchange')
 
-@login_required
+'''@login_required
 def accept(request, id):
     # get the contract
     try:
@@ -368,4 +368,4 @@ def addOrCreate(issuer, holder, qty, type):
                   holder=holder,
                   qty=qty,
                   type=type)
-        iou.save()
+        iou.save()'''
