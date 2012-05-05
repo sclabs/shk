@@ -194,20 +194,10 @@ def fail(request, id):
         if contract.recipient.user == request.user:
             # check to see that the timeout has passed
             if contract.timeout < timezone.now():
-                # if an IOU like this already exists, add to it
-                try:
-                    iou = IOU.objects.get(issuer=contract.sender,
-                                          holder=request.user,
-                                          type=contract.type)
-                    iou.qty += contract.qty
-                    iou.save()
-                # otherwise, create a new one
-                except IOU.DoesNotExist:
-                    iou = IOU(issuer=contract.sender,
-                              holder=request.user,
-                              qty=contract.qty,
-                              type=contract.type)
-                    iou.save()
+                addOrCreate(contract.sender,
+                            request.user,
+                            contract.qty,
+                            contract.type)
                 # delete the contract
                 contract.delete()
     except RecallContract.DoesNotExist:
@@ -265,3 +255,117 @@ def cancel(request, id):
     except ExchangeContract.DoesNotExist:
         pass
     return redirect('exchange')
+
+@login_required
+def accept(request, id):
+    # get the contract
+    try:
+        contract = ExchangeContract.objects.get(id=id)
+        # get the bundles
+        bundles = Bundle.objects.filter(contract=contract)
+        for bundle in bundles:
+            if bundle.send:
+                # how many IOUs short are we?
+                held = countIOUs(contract.issuer, bundle.type)
+                shortage = bundle.qty - held
+                if shortage > 0:
+                    addOrCreate(contract.issuer,
+                                request.user,
+                                shortage,
+                                bundle.type)
+                    transferIOUs(contract.issuer,
+                                 request.user,
+                                 held,
+                                 bundle.type)
+                else:
+                    transferIOUs(contract.issuer,
+                                 request.user,
+                                 bundle.qty,
+                                 bundle.type)
+            else:
+                # how many IOUs short are we?
+                held = countIOUs(request.user, bundle.type)
+                shortage = bundle.qty - held
+                if shortage > 0:
+                    addOrCreate(request.user,
+                                contract.issuer,
+                                shortage,
+                                bundle.type)
+                    transferIOUs(request.user,
+                                 contract.issuer,
+                                 held,
+                                 bundle.type)
+                else:
+                    transferIOUs(request.user,
+                                 contract.issuer,
+                                 bundle.qty,
+                                 bundle.type)
+        contract.delete()
+    except ExchangeContract.DoesNotExist:
+        pass
+    return redirect('exchange')
+
+# helper methods
+def countIOUs(user, type):
+    # keep track of the quantity
+    count = 0
+    # get all the IOUs
+    ious = IOU.objects.filter(holder=user, type=type)
+    # count all the things
+    for iou in ious:
+        count += iou.qty
+    return count
+    
+def transferIOUs(oldHolder, newHolder, qty, type):
+    # keep track of this
+    transferred = 0
+    while transferred != qty:
+        # first, see if we're already owed this
+        try:
+            iou = IOU.objects.get(issuer=newHolder,
+                                  holder=oldHolder,
+                                  type=type)
+            excess = transferred + iou.qty - qty
+            if excess <= 0:
+                # go ahead with the transfer
+                transferred += iou.qty
+                iou.delete()
+            else:
+                # how much of this one we need to transfer?
+                transfer = iou.qty - excess
+                transferred += transfer
+                iou.qty -= transfer
+                iou.save()
+        except IOU.DoesNotExist:
+            # grab a random IOU of this type
+            # make sure this exists!
+            iou = IOU.objects.filter(holder=oldHolder, type=type)[0]
+            excess = transferred + iou.qty - qty
+            if excess <= 0:
+                # go ahead with the transfer
+                addOrCreate(iou.issuer, newHolder, iou.qty, type)
+                transferred += iou.qty
+                iou.delete()
+            else:
+                # how much of this one we need to transfer?
+                transfer = iou.qty - excess
+                addOrCreate(iou.issuer, newHolder, transfer, type)
+                transferred += transfer
+                iou.qty -= transfer
+                iou.save()
+    
+def addOrCreate(issuer, holder, qty, type):
+    # if an IOU like this already exists, add to it
+    try:
+        iou = IOU.objects.get(issuer=issuer,
+                              holder=holder,
+                              type=type)
+        iou.qty += qty
+        iou.save()
+    # otherwise, create a new one
+    except IOU.DoesNotExist:
+        iou = IOU(issuer=issuer,
+                  holder=holder,
+                  qty=qty,
+                  type=type)
+        iou.save()
