@@ -6,6 +6,82 @@ from django.utils import timezone
 from .forms import *
 
 @login_required
+def market(request):
+    ## exchange ##########################################################
+    
+    # get all the contracts not issued by the user
+    contracts = ExchangeContract.objects.all().exclude(issuer=request.user)
+
+    # get all the contracts issued by the user
+    myContracts = ExchangeContract.objects.filter(issuer=request.user)
+    
+    # dictionaries that map contracts to lists of bundles
+    sendBundles = {}
+    receiveBundles = {}
+
+    # fill in the dictionaries
+    for contract in contracts:
+        bundles = Bundle.objects.filter(contract=contract)
+        sendBundles[contract.id] = []
+        receiveBundles[contract.id] = []
+        for bundle in bundles:
+            if bundle.send:
+                sendBundles[contract.id].append(bundle)
+            else:
+                receiveBundles[contract.id].append(bundle)
+                
+    # dictionaries that map myContracts to lists of bundles
+    mySendBundles = {}
+    myReceiveBundles = {}
+
+    # fill in the dictionaries
+    for contract in myContracts:
+        bundles = Bundle.objects.filter(contract=contract)
+        mySendBundles[contract.id] = []
+        myReceiveBundles[contract.id] = []
+        for bundle in bundles:
+            if bundle.send:
+                mySendBundles[contract.id].append(bundle)
+            else:
+                myReceiveBundles[contract.id].append(bundle)
+
+    ## IOUs ##########################################################
+                
+    # get all the IOUs held by the user
+    iousHeld = IOU.objects.filter(holder=request.user)
+
+    # get all the IOUs issued by the user
+    iousIssued = IOU.objects.filter(issuer=request.user)
+
+    ## RecallContracts ###############################################
+    
+    # get all the contracts issued to the player
+    contractsToMe = RecallContract.objects.filter(sender=request.user)
+
+    # get all the contracts issued by the player
+    # first get all the user's villages
+    villages = Village.objects.filter(user=request.user)
+
+    # list of all the contracts
+    contractsByMe = []
+
+    # fill in the list
+    for village in villages:
+        contractsByMe.extend(RecallContract.objects.filter(recipient=village))
+
+    # use this dict to keep track of which contracts are failable
+    failable = {}
+
+    # fill in the dict
+    for contract in contractsByMe:
+        if contract.timeout < timezone.now():
+            failable[contract.id] = True
+        else:
+            failable[contract.id] = False
+
+    return render_to_response('market.html', locals(), RequestContext(request))
+
+'''@login_required
 def exchange(request):
     # get all the contracts not issued by the user
     contracts = ExchangeContract.objects.all().exclude(issuer=request.user)
@@ -81,7 +157,7 @@ def contracts(request):
         else:
             failable[contract.id] = False
 
-    return render_to_response('contracts.html', locals())
+    return render_to_response('contracts.html', locals())'''
 
 @login_required
 def villages(request):
@@ -92,14 +168,18 @@ def villages(request):
     # a dictionary to keep track of this
     deletable = {}
 
+    # a flag for the alert
+    alert = False
+
     # fill in the dictionary
     for village in villages:
         if RecallContract.objects.filter(recipient=village):
             deletable[village.id] = False
+            alert = True
         else:
             deletable[village.id] = True
 
-    return render_to_response('villages.html', locals())
+    return render_to_response('villages.html', locals(), RequestContext(request))
 
 @login_required
 def addVillage(request):
@@ -136,12 +216,12 @@ def recall(request, id):
     try:
         iou = IOU.objects.get(id=id)
     except IOU.DoesNotExist:
-        return redirect('ious')
+        return redirect('market')
         
     if request.method == 'POST':
         # redirect to ious if you don't hold this iou
         if iou.holder != request.user:
-            return redirect('ious')
+            return redirect('market')
 
         # make the bound form
         form = RecallForm(request.POST, iou=iou)
@@ -167,10 +247,10 @@ def recall(request, id):
                                       type=iou.type,
                                       timeout=cd['timeout'])
             contract.save()
-            return redirect('ious')
+            return redirect('market')
     else:
         form = RecallForm(iou=iou)
-    return render_to_response('recall.html', {'form': form}, RequestContext(request))
+    return render_to_response('recall.html', {'form': form, 'iou': iou}, RequestContext(request))
 
 @login_required
 def complete(request, id):
@@ -183,7 +263,7 @@ def complete(request, id):
             contract.delete()
     except RecallContract.DoesNotExist:
         pass
-    return redirect('contracts')
+    return redirect('market')
 
 @login_required
 def fail(request, id):
@@ -202,7 +282,7 @@ def fail(request, id):
                 contract.delete()
     except RecallContract.DoesNotExist:
         pass
-    return redirect('contracts')
+    return redirect('market')
 
 @login_required
 def precreate(request):
@@ -238,10 +318,16 @@ def create(request, send, receive):
                                        type=cd['receive_type_%i' % i],
                                        contract=contract)
                 receiveBundle.save()
-            return redirect('exchange')
+            return redirect('market')
     else:
         form = CreateForm(send=send, receive=receive)
-    return render_to_response('create.html', {'form': form}, RequestContext(request))
+    return render_to_response('create.html',
+                              {'form': form,
+                               'nocomma': int(send)*2,
+                               'and1': int(send)*2 - 2,
+                               'sendcomma': int(send) > 2,
+                               'receivecomma': int(receive) > 2},
+                              RequestContext(request))
 
 @login_required
 def cancel(request, id):
@@ -254,7 +340,7 @@ def cancel(request, id):
             contract.delete()
     except ExchangeContract.DoesNotExist:
         pass
-    return redirect('exchange')
+    return redirect('market')
 
 @login_required
 def accept(request, id):
@@ -303,7 +389,7 @@ def accept(request, id):
         contract.delete()
     except ExchangeContract.DoesNotExist:
         pass
-    return redirect('exchange')
+    return redirect('market')
 
 # helper methods
 def countIOUs(user, type):

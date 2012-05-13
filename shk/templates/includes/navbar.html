@@ -1,0 +1,36 @@
+<!-- Le navbar
+================================================== -->
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="{% url market %}">Stronghold Kingdoms</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="{% url market %}">Market</a></li>
+          <li><a href="{% url villages %}">Villages</a></li>
+          <li><a href="http://wiki.gilgi.org/shk/">Wiki</a></li>
+        </ul>
+        <ul class="nav pull-right">
+          {% if user.is_authenticated %}
+          <li class="dropdown">
+            <a href="http://gilgi.org" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url changepassword %}">Change Password</a></li>
+              <li><a href="{% url switchuser %}">Switch User</a></li>
+              <li class="divider"></li>
+              <li><a href="{% url logout %}">Logout</a></li>
+            </ul>
+          </li>
+          {% else %}
+          <li class="pull-right"><a href="{% url login %}">Login</a></li>
+          {% endif %}
+        </ul>
+      </div><!-- /.nav-collapse -->
+    </div>
+  </div><!-- /navbar-inner -->
+</div><!-- /navbar -->

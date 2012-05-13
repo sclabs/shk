@@ -3,6 +3,11 @@
 {% block title %}shk - create exchange contract: step 2{% endblock %}
 
 {% block content %}
+
+<h1>Create Exchange Contract
+<small>Step 2 of 2</small>
+</h1>
+
   {% if form.errors %}
     <p>
       Please correct the error{{ form.errors|pluralize }} below.
@@ -10,9 +15,36 @@
   {% endif %}
 
   <form action="" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    <p>I want to offer</p>
+    {% for field in form %}
+      {% if "Send" in field.label %}
+        {% if "qty" in field.label %}<p>{% endif %}
+        {{ field.errors }} {{ field }}
+        {% if sendcomma %}
+          {%if forloop.counter != nocomma %}{% cycle " " ", "%}{% endif %}
+        {% endif %}
+        {% if forloop.counter == and1 %} and{% endif %}
+        {% if "type" in field.label %}</p>{% endif %}
+      {% endif%}
+    {% endfor %}
+    <p>in exchange for</p>
+    {% for field in form %}
+      {% if "Receive" in field.label %}
+        {% if "qty" in field.label %}<p>{% endif %}
+        {{ field.errors }} {{ field }}
+        {% if receivecomma %}
+          {% if not forloop.last %}{% cycle " " ", "%}{% endif %}
+        {% endif %}
+        {% if forloop.revcounter == 3 %} and{% endif %}
+        {% if forloop.last %}.{% endif %}
+        {% if "type" in field.label %}</p>{% endif %}
+      {% endif%}
+    {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Create">
+  </form>
+{% endblock %}
+
     <table>
       {{ form.as_table }}
     </table>
-    <input type="submit" value="Submit">
-  </form>
-{% endblock %}

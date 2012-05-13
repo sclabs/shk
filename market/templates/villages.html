@@ -6,12 +6,21 @@
 
 {% block content %}
 
-<p>My Villages</p>
+<h1>My Villages
+<small style="float:right;">
+<a class="btn btn-primary" href="{% url addVillage %}">Add New Village</a>
+</small>
+</h1>
 
-<a href="{% url addVillage %}">Add New Village</a>
+{% if alert %}
+<div class="alert">
+  <button class="close" data-dismiss="alert">&times;</button>
+  <strong>Warning!</strong> Some of your villages cannot be removed because they are involved in active contracts.
+</div>
+{% endif %}
 
 {% if villages %}
-<table border="1">
+<table class="table table-bordered table-striped">
   <tr>
     <th>Name</th>
     <th>Remove</th>
@@ -23,7 +32,9 @@
     </td>
     <td>
       {% if deletable|lookup:village.id %}
-      <a href="{% url removeVillage village.id %}">Remove Village</a>
+      <a class="btn btn-danger btn-mini" href="{% url removeVillage village.id %}">Remove Village</a>
+      {% else %}
+      <a class="btn btn-danger disabled btn-mini" href="#">Remove Village</a>
       {% endif %}
     </td>
   </tr>

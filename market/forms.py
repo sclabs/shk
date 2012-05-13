@@ -3,11 +3,11 @@ from .models import Village
 from .data import GOOD_TYPES
 
 class VillageForm(forms.Form):
-    name = forms.CharField(max_length=30)
+    name = forms.CharField(max_length=30, label="Village Name")
 
 class RecallForm(forms.Form):
-    qty       = forms.IntegerField()
-    recipient = forms.ModelChoiceField(queryset=Village.objects.none())
+    qty       = forms.IntegerField(label="Quantity to recall")
+    recipient = forms.ModelChoiceField(queryset=Village.objects.none(), label="Village to recall to")
     timeout   = forms.DateTimeField()
 
     # form needs to know this, will be set in constructor
@@ -35,8 +35,8 @@ class RecallForm(forms.Form):
         return qty
 
 class PrecreateForm(forms.Form):
-    send    = forms.IntegerField()
-    receive = forms.IntegerField()
+    send    = forms.IntegerField(label="Types offered", help_text="The number of different types of goods you want to offer in this contract.")
+    receive = forms.IntegerField(label="Types wanted", help_text="The number of different types of goods you want to receive in this contract.")
 
 class CreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
