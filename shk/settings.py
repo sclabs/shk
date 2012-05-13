@@ -70,6 +70,8 @@ STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = SITE_URL + 'static/'
 
+ADMIN_MEDIA_PREFIX = '/static/admin/'
+
 # auth-related URLs
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
