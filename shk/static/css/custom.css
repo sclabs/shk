@@ -1,3 +1,13 @@
+/* narrow textfields
+-------------------------------------------------- */
+.narrow, .timepicker {
+    width: 50px;
+}
+
+#id_timeout_3 {
+    width: 70px;
+}
+
 /* no bottom margin on ul's
 -------------------------------------------------- */
 ul {

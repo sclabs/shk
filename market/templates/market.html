@@ -162,6 +162,13 @@
 
 <h3>Contracts Issued by Me</h3>
 
+{% if alert %}
+<div class="alert">
+  <button class="close" data-dismiss="alert">&times;</button>
+  <strong>Warning!</strong> Some of your contracts cannot be failed yet because their timeouts have yet to elapse.
+</div>
+{% endif %}
+
 {% if contractsByMe %}
 <table class="table table-bordered table-striped">
   <tr>

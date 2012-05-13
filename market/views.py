@@ -72,12 +72,16 @@ def market(request):
     # use this dict to keep track of which contracts are failable
     failable = {}
 
+    # flag for alert
+    alert = False
+
     # fill in the dict
     for contract in contractsByMe:
         if contract.timeout < timezone.now():
             failable[contract.id] = True
         else:
             failable[contract.id] = False
+            alert = True
 
     return render_to_response('market.html', locals(), RequestContext(request))
 
