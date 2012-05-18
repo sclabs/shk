@@ -288,6 +288,7 @@ def fail(request, id):
         pass
     return redirect('market')
 
+'''
 @login_required
 def precreate(request):
     if request.method == 'POST':
@@ -298,6 +299,7 @@ def precreate(request):
     else:
         form = PrecreateForm()
     return render_to_response('precreate.html', {'form': form}, RequestContext(request))
+'''
 
 @login_required
 def create(request, send, receive):
@@ -330,7 +332,13 @@ def create(request, send, receive):
                                'nocomma': int(send)*2,
                                'and1': int(send)*2 - 2,
                                'sendcomma': int(send) > 2,
-                               'receivecomma': int(receive) > 2},
+                               'receivecomma': int(receive) > 2,
+                               'send': int(send),
+                               'receive': int(receive),
+                               'addsend': int(send) + 1,
+                               'removesend': int(send) - 1,
+                               'addreceive': int(receive) + 1,
+                               'removereceive': int(receive) - 1},
                               RequestContext(request))
 
 @login_required

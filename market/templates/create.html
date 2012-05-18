@@ -4,9 +4,7 @@
 
 {% block content %}
 
-<h1>Create Exchange Contract
-<small>Step 2 of 2</small>
-</h1>
+<h1>Create Exchange Contract</h1>
 
   {% if form.errors %}
     <p>
@@ -28,6 +26,14 @@
         {% if "type" in field.label %}</p>{% endif %}
       {% endif%}
     {% endfor %}
+    <div class="btn-group" style="padding-bottom: 10px;">
+      <a class="btn btn-success" title="Offer more types" href="{% url create addsend receive %}"><i class="icon-plus"></i></a>
+      {% if send == 1 %}
+      <a class="btn btn-danger disabled" href=""><i class="icon-minus"></i></a>
+      {% else %}
+      <a class="btn btn-danger" title="Offer fewer types" href="{% url create removesend receive %}"><i class="icon-minus"></i></a>
+      {% endif %}
+    </div>
     <p>in exchange for</p>
     {% for field in form %}
       {% if "Receive" in field.label %}
@@ -41,10 +47,14 @@
         {% if "type" in field.label %}</p>{% endif %}
       {% endif%}
     {% endfor %}
+    <div class="btn-group" style="padding-bottom: 10px;">
+      <a class="btn btn-success" title="Receive more types" href="{% url create send addreceive %}"><i class="icon-plus"></i></a>
+      {% if receive == 1 %}
+      <a class="btn btn-danger disabled" href=""><i class="icon-minus"></i></a>
+      {% else %}
+      <a class="btn btn-danger" title="Receive fewer types" href="{% url create send removereceive %}"><i class="icon-minus"></i></a>
+      {% endif %}
+    </div>
     <input class="btn btn-primary" type="submit" value="Create">
   </form>
 {% endblock %}
-
-    <table>
-      {{ form.as_table }}
-    </table>

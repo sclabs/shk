@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('market.views',
     url(r'^$', 'market', name='market'),
     #url(r'^exchange/$', 'exchange', name='exchange'),
-    url(r'^exchange/create/$', 'precreate', name='precreate'),
+    #url(r'^exchange/create/$', 'precreate', name='precreate'),
     url(r'^exchange/create/(\d+)-(\d+)/$', 'create', name='create'),
     url(r'^exchange/cancel/(\d+)/$', 'cancel', name='cancel'),
     url(r'^exchange/accept/(\d+)/$', 'accept', name='accept'),
