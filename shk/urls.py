@@ -1,12 +1,14 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from .settings import DEBUG, MEDIA_ROOT, STATIC_ROOT
-from django.views.generic import RedirectView
-from django.core.urlresolvers import reverse
+from django.views.generic.simple import direct_to_template
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    # changelog
+    url(r'^changelog/$', direct_to_template, {'template': 'changelog.html'}, name='changelog'),
+                       
     # contracts app
     #url(r'^market/', include('market.urls')),
     url(r'^', include('market.urls')),

@@ -29,6 +29,9 @@ class RecallForm(forms.Form):
         # set the choices for the recipient
         self.fields['recipient'].queryset = Village.objects.filter(user=iou.holder)
 
+        # set the initial value of the qty field to the maximum quantity
+        self.fields['qty'].initial = iou.qty
+
     # custom validation code to make sure that qty is legal
     def clean_qty(self):
         qty = self.cleaned_data['qty']
